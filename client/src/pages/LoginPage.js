@@ -3,16 +3,37 @@ import React, { useState } from 'react';
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log({ email, password }); // Placeholder for functionality
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('token', data.token);
+                window.location.href = '/'; // change this to redirect to dashboard  '/dashboard'
+            } else {
+                setError(data.message || 'Login failed.');
+            }
+        } catch (err) {
+            setError('An error occurred. Please try again later.');
+        }
     };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
                 <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+                {error && <p className="text-red-500 mb-4">{error}</p>}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="email"

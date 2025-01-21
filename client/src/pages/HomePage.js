@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Layout from '../components/Layout';
+import { AuthContext } from '../state/AuthContext';
 
 const HomePage = () => {
+    const { isLoggedIn } = useContext(AuthContext);
+
+    console.log(isLoggedIn);
+
     return (
         <Layout>
             {/* Hero Section */}
@@ -10,20 +15,22 @@ const HomePage = () => {
                 <p className="text-lg text-gray-700 mb-6">
                     Connect contributors of recyclable materials with buyers of upcycled products and make a positive impact on the planet.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button
-                        className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700"
-                        onClick={() => window.location.href = '/signup'}
-                    >
-                        Get Started
-                    </button>
-                    <button
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700"
-                        onClick={() => window.location.href = '/login'}
-                    >
-                        Login
-                    </button>
-                </div>
+                {!isLoggedIn && (
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button
+                            className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700"
+                            onClick={() => window.location.href = '/signup'}
+                        >
+                            Get Started
+                        </button>
+                        <button
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700"
+                            onClick={() => window.location.href = '/login'}
+                        >
+                            Login
+                        </button>
+                    </div>
+                )}
             </section>
 
             {/* Key Features Section */}
