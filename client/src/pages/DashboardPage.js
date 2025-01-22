@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../state/AuthContext';
 import Layout from '../components/Layout';
 import Material from '../components/Material';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('Material');
     const [items, setItems] = useState([]); // To store the list of materials or products
+    const navigate = useNavigate(); // For navigation
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -40,7 +42,33 @@ const DashboardPage = () => {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/${activeTab.toLowerCase()}s`); // Fetch materials or products
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('User not authenticated');
+                    return;
+                }
+
+                const userResponse = await fetch('http://localhost:5000/api/user', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!userResponse.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+
+                const user = await userResponse.json();
+                const userId = user._id;
+
+                const response = await fetch(`http://localhost:5000/api/${activeTab.toLowerCase()}s/user/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
 
                 if (response.ok) {
                     const data = await response.json();
@@ -101,17 +129,29 @@ const DashboardPage = () => {
                         </button>
                     </div>
 
+                    {/* Add Material Button */}
+                    {activeTab === 'Material' && (
+                        <div className="mb-4">
+                            <button
+                                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                                onClick={() => navigate('/material/add')}
+                            >
+                                Add Material
+                            </button>
+                        </div>
+                    )}
+
                     {/* List of Items */}
-                    <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+                    <div className="bg-gray-50 p-4 rounded-lg shadow-md max-w-md">
                         <h4 className="text-lg font-bold mb-4">{activeTab}s</h4>
                         {items.length > 0 ? (
                             <ul className="space-y-4">
                                 {items.map((item) => (
-                                    <li key={item.id}>
+                                    <li key={item._id} className="text-left">
                                         {activeTab === 'Material' ? (
-                                            <Material material={item} />
+                                            <Material material={item || { name: 'Unknown', description: 'No description available', category: 'Unknown', location: 'Unknown', quantity: 0, unit: 'N/A', imageUrl: 'https://via.placeholder.com/150' }} />
                                         ) : (
-                                            <div className="p-4 bg-white shadow-md rounded-md">{item.name}</div>
+                                            <div className="p-4 bg-white shadow-md rounded-md">{item.name || 'Unknown'}</div>
                                         )}
                                     </li>
                                 ))}
