@@ -1,19 +1,53 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 
-const MaterialFormPage = ({ material }) => {
+const MaterialFormPage = () => {
     const [formData, setFormData] = useState({
-        name: material?.name || '',
-        category: material?.category || '',
-        quantity: material?.quantity || '',
-        unit: material?.unit || '',
-        location: material?.location || '',
-        description: material?.description || '',
-        imageUrl: material?.imageUrl || '',
+        name: '',
+        category: '',
+        quantity: '',
+        unit: '',
+        location: '',
+        description: '',
+        imageUrl: '',
     });
-
+    const [loading, setLoading] = useState(true);
+    const { id } = useParams(); // Retrieve material ID from URL
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // If `id` exists, fetch material data from the server
+        if (id) {
+            const fetchMaterialData = async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`http://localhost:5000/api/materials/${id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        setFormData(data); // Populate the form with material data
+                    } else {
+                        console.error('Failed to fetch material data');
+                    }
+                } catch (error) {
+                    console.error('Error fetching material data:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchMaterialData();
+        } else {
+            setLoading(false); // If no ID, it's an add material scenario
+        }
+    }, [id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -26,41 +60,12 @@ const MaterialFormPage = ({ material }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Fetch user ID from the token
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert('You must be logged in to perform this action');
-            return;
-        }
-
         try {
-            const userResponse = await fetch('http://localhost:5000/api/user', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!userResponse.ok) {
-                throw new Error('Failed to fetch user data');
-            }
-
-            const user = await userResponse.json();
-            const userId = user._id;
-
-            // Add the userId to formData and set default imageUrl if not provided
-            const materialData = {
-                ...formData,
-                userId,
-                imageUrl: formData.imageUrl || 'https://img.freepik.com/premium-photo/material-word-wooden-block-flat-lay-view-blue-background_446269-288.jpg',
-            };
-
-            // Determine the API endpoint (add or update)
-            const apiUrl = material
-                ? `http://localhost:5000/api/materials/${material._id}` // Update
-                : 'http://localhost:5000/api/materials'; // Add
-            const method = material ? 'PUT' : 'POST';
+            const token = localStorage.getItem('token');
+            const apiUrl = id
+                ? `http://localhost:5000/api/materials/${id}` // Update material if ID exists
+                : 'http://localhost:5000/api/materials'; // Add material otherwise
+            const method = id ? 'PUT' : 'POST';
 
             const response = await fetch(apiUrl, {
                 method,
@@ -68,11 +73,11 @@ const MaterialFormPage = ({ material }) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify(materialData),
+                body: JSON.stringify(formData),
             });
 
             if (response.ok) {
-                alert(material ? 'Material updated successfully' : 'Material added successfully');
+                alert(id ? 'Material updated successfully' : 'Material added successfully');
                 navigate('/dashboard'); // Navigate back to dashboard after success
             } else {
                 throw new Error('Failed to save material');
@@ -83,12 +88,20 @@ const MaterialFormPage = ({ material }) => {
         }
     };
 
+    if (loading) {
+        return (
+            <Layout>
+                <div className="min-h-screen flex items-center justify-center">Loading...</div>
+            </Layout>
+        );
+    }
+
     return (
         <Layout>
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
                     <h2 className="text-2xl font-bold text-center mb-4">
-                        {material ? 'Update Material' : 'Add Material'}
+                        {id ? 'Edit Material' : 'Add Material'}
                     </h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
@@ -170,7 +183,7 @@ const MaterialFormPage = ({ material }) => {
                             type="submit"
                             className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
                         >
-                            {material ? 'Update Material' : 'Add Material'}
+                            {id ? 'Update Material' : 'Add Material'}
                         </button>
                     </form>
                 </div>

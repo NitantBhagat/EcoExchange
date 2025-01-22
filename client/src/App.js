@@ -20,7 +20,16 @@ function App() {
                         <DashboardPage />
                     </PrivateRoute>
                 } />
-                <Route path="/material/add" element={<MaterialFormPage />} />
+                <Route path="/material/add" element={
+                    <PrivateRoute>
+                        <MaterialFormPage />
+                    </PrivateRoute>
+                } />
+                <Route path="/material/edit/:id" element={
+                    <PrivateRoute>
+                        <MaterialFormPage />
+                    </PrivateRoute>
+                } />
             </Routes>
         </Router>
     );

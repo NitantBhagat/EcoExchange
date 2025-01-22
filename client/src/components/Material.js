@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Material = ({ material }) => {
+const Material = ({ material, onEdit }) => {
     const {
         name = 'Unknown Material',
         category = 'Uncategorized',
@@ -9,7 +9,7 @@ const Material = ({ material }) => {
         location = 'Unknown Location',
         description = 'No description available.',
         imageUrl = 'https://via.placeholder.com/150',
-        userId = { name: 'Unknown', email: 'Unknown' },
+        userId  = { name: 'Unknown', email: 'Unknown' },
     } = material;
 
     return (
@@ -24,7 +24,7 @@ const Material = ({ material }) => {
                 <strong>Category:</strong> {category}
             </p>
             <p className="text-gray-700 mb-2">
-                <strong>Quantity:</strong> {quantity} (Unit :{unit})
+                <strong>Quantity:</strong> {quantity} {unit}
             </p>
             <p className="text-gray-700 mb-2">
                 <strong>Location:</strong> {location}
@@ -33,13 +33,13 @@ const Material = ({ material }) => {
                 <strong>Description:</strong> {description}
             </p>
             <p className="text-gray-700 mb-4">
-                <strong>Posted By:</strong> {userId.name} ({userId.email})
+                <strong>Posted By:</strong> {userId.name} 
             </p>
             <button
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-                onClick={() => alert('Request Material functionality not implemented yet.')}
+                className={`bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700`}
+                onClick={onEdit || (() => alert('Request Material functionality not implemented yet.'))}
             >
-                Request Material
+                {onEdit ? 'Edit Material' : 'Request Material'}
             </button>
         </div>
     );

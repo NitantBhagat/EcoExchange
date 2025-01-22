@@ -149,7 +149,8 @@ const DashboardPage = () => {
                                 {items.map((item) => (
                                     <li key={item._id} className="text-left">
                                         {activeTab === 'Material' ? (
-                                            <Material material={item || { name: 'Unknown', description: 'No description available', category: 'Unknown', location: 'Unknown', quantity: 0, unit: 'N/A', imageUrl: 'https://via.placeholder.com/150' }} />
+                                            <Material material={item || { name: 'Unknown', description: 'No description available', category: 'Unknown', location: 'Unknown', quantity: 0, unit: 'N/A', imageUrl: 'https://via.placeholder.com/150' }}
+                                            onEdit={() => navigate(`/material/edit/${item._id}`)} />
                                         ) : (
                                             <div className="p-4 bg-white shadow-md rounded-md">{item.name || 'Unknown'}</div>
                                         )}
