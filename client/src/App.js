@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import PrivateRoute from './components/PrivateRoute';
+import MaterialFormPage from './pages/MaterialFormPage';
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                         <DashboardPage />
                     </PrivateRoute>
                 } />
+                <Route path="/material/add" element={<MaterialFormPage />} />
             </Routes>
         </Router>
     );
