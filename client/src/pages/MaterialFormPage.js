@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 
-const MaterialFormPage = () => {
+const MaterialFormPage = ({ material }) => {
     const [formData, setFormData] = useState({
         name: '',
         category: '',
@@ -11,60 +11,75 @@ const MaterialFormPage = () => {
         location: '',
         description: '',
         imageUrl: '',
+        isAvailable: true,
     });
+
     const [loading, setLoading] = useState(true);
-    const { id } = useParams(); // Retrieve material ID from URL
     const navigate = useNavigate();
+    const { id } = useParams(); // Get the material ID from the URL
 
     useEffect(() => {
-        // If `id` exists, fetch material data from the server
-        if (id) {
-            const fetchMaterialData = async () => {
-                try {
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`http://localhost:5000/api/materials/${id}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json',
-                        },
-                    });
+        const fetchMaterial = async () => {
+            if (!id) {
+                // If no ID, it's an add operation
+                setLoading(false);
+                return;
+            }
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        setFormData(data); // Populate the form with material data
-                    } else {
-                        console.error('Failed to fetch material data');
-                    }
-                } catch (error) {
-                    console.error('Error fetching material data:', error);
-                } finally {
-                    setLoading(false);
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`http://localhost:5000/api/materials/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setFormData(data); // Populate form data with fetched material
+                } else {
+                    console.error('Failed to fetch material');
+                    alert('Failed to fetch material details.');
                 }
-            };
+            } catch (error) {
+                console.error('Error fetching material:', error);
+                alert('An error occurred while fetching the material details.');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-            fetchMaterialData();
-        } else {
-            setLoading(false); // If no ID, it's an add material scenario
-        }
+        fetchMaterial();
     }, [id]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
-            [name]: value,
+            [name]: type === 'checkbox' ? checked : value,
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('You must be logged in to perform this action');
+            return;
+        }
+
         try {
-            const token = localStorage.getItem('token');
+            const materialData = {
+                ...formData,
+                imageUrl: formData.imageUrl || 'https://img.freepik.com/premium-photo/material-word-wooden-block-flat-lay-view-blue-background_446269-288.jpg',
+            };
+
             const apiUrl = id
-                ? `http://localhost:5000/api/materials/${id}` // Update material if ID exists
-                : 'http://localhost:5000/api/materials'; // Add material otherwise
+                ? `http://localhost:5000/api/materials/${id}`
+                : 'http://localhost:5000/api/materials';
             const method = id ? 'PUT' : 'POST';
 
             const response = await fetch(apiUrl, {
@@ -73,12 +88,12 @@ const MaterialFormPage = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(materialData),
             });
 
             if (response.ok) {
                 alert(id ? 'Material updated successfully' : 'Material added successfully');
-                navigate('/dashboard'); // Navigate back to dashboard after success
+                navigate('/dashboard');
             } else {
                 throw new Error('Failed to save material');
             }
@@ -91,7 +106,9 @@ const MaterialFormPage = () => {
     if (loading) {
         return (
             <Layout>
-                <div className="min-h-screen flex items-center justify-center">Loading...</div>
+                <div className="min-h-screen flex items-center justify-center">
+                    <p>Loading...</p>
+                </div>
             </Layout>
         );
     }
@@ -101,7 +118,7 @@ const MaterialFormPage = () => {
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
                     <h2 className="text-2xl font-bold text-center mb-4">
-                        {id ? 'Edit Material' : 'Add Material'}
+                        {id ? 'Update Material' : 'Add Material'}
                     </h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
@@ -178,6 +195,18 @@ const MaterialFormPage = () => {
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                             />
+                        </div>
+                        <div>
+                            <label className="inline-flex items-center">
+                                <input
+                                    type="checkbox"
+                                    name="isAvailable"
+                                    checked={formData.isAvailable}
+                                    onChange={handleChange}
+                                    className="form-checkbox text-green-600"
+                                />
+                                <span className="ml-2 text-gray-700">Available</span>
+                            </label>
                         </div>
                         <button
                             type="submit"

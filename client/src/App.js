@@ -6,6 +6,7 @@ import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import PrivateRoute from './components/PrivateRoute';
 import MaterialFormPage from './pages/MaterialFormPage';
+import MaterialListPage from './pages/MaterialListPage';
 
 function App() {
     return (
@@ -30,6 +31,13 @@ function App() {
                         <MaterialFormPage />
                     </PrivateRoute>
                 } />
+
+                <Route path="/materials" element={
+                    <PrivateRoute>
+                        <MaterialListPage />
+                    </PrivateRoute>
+                } />
+
             </Routes>
         </Router>
     );
