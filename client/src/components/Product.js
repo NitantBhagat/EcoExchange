@@ -1,13 +1,22 @@
 import React from 'react';
 
-const Product = ({ product, onEdit }) => {
+const Product = ({ product, onEdit, onRequestProduct }) => {
     const {
         name = 'Unknown Product',
-        price = 'N/A',
+        category = 'Uncategorized',
+        price = 0,
         description = 'No description available.',
-        imageUrl = 'https://via.placeholder.com/150',
-        userId = { name: 'Unknown', email: 'Unknown' },
+        imageUrl = 'https://www.printwand.com/blog/media/2012/01/ultimate-guide-to-your-product-launch.jpg',
+        userId,
+        isAvailable = true,
     } = product;
+
+    // const postedByName = userId?.name || 'Unknown';
+    // const postedByEmail = userId?.email || 'Unknown';
+
+    const postedByName = product.seller?.name || 'Unknown';
+    const postedByEmail = product.seller?.email || 'Unknown';
+
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
@@ -18,20 +27,35 @@ const Product = ({ product, onEdit }) => {
             />
             <h2 className="text-xl font-bold text-green-600 mb-4">{name}</h2>
             <p className="text-gray-700 mb-2">
+                <strong>Category:</strong> {category}
+            </p>
+            <p className="text-gray-700 mb-2">
                 <strong>Price:</strong> ${price}
             </p>
             <p className="text-gray-700 mb-4">
                 <strong>Description:</strong> {description}
             </p>
             <p className="text-gray-700 mb-4">
-                <strong>Uploaded By:</strong> {userId.name} ({userId.email})
+                <strong>Posted By:</strong> {postedByName} 
             </p>
-            <button
-                className={`bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700`}
-                onClick={onEdit || (() => alert('Request Product functionality not implemented yet.'))}
-            >
-                {onEdit ? 'Edit Product' : 'Request Product'}
-            </button>
+            <p className={`text-sm font-bold ${isAvailable ? 'text-green-600' : 'text-red-600'} mb-4`}>
+                {isAvailable ? 'Available' : 'Not Available'}
+            </p>
+            {onEdit ? (
+                <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    onClick={onEdit}
+                >
+                    Edit Product
+                </button>
+            ) : onRequestProduct ? (
+                <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    onClick={onRequestProduct}
+                >
+                    Request Product
+                </button>
+            ) : null}
         </div>
     );
 };
