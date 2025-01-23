@@ -7,6 +7,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const materialRoutes = require('./routes/materials');
+const productRoutes = require('./routes/products');
 
 // Load environment variables
 dotenv.config();
@@ -22,7 +23,7 @@ app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes); // User routes
 app.use('/api/materials', materialRoutes);
-
+app.use('/api/products', productRoutes);
 
 // Database Connection
 const connectDB = async () => {

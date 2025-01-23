@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../state/AuthContext';
 import Layout from '../components/Layout';
 import Material from '../components/Material';
-import Product from '../components/Product'; // Assume you have a Product component
+import Product from '../components/Product'; // Assuming Product is a separate component
 import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
@@ -96,6 +95,7 @@ const DashboardPage = () => {
     return (
         <Layout>
             <div className="min-h-screen bg-gray-100 flex">
+                {/* User Profile Section */}
                 <div className="bg-white w-full max-w-sm p-6 rounded-lg shadow-md mr-6">
                     <div className="flex flex-col items-center">
                         <img
@@ -107,6 +107,8 @@ const DashboardPage = () => {
                         <p className="text-gray-600 mb-4 text-center">{user.email}</p>
                     </div>
                 </div>
+
+                {/* Main Dashboard Section */}
                 <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold text-green-600 mb-4">Dashboard</h2>
                     <div className="bg-green-50 p-4 rounded-lg shadow-md mb-4">
@@ -144,7 +146,7 @@ const DashboardPage = () => {
                     {activeTab === 'Product' && (
                         <div className="mb-4">
                             <button
-                                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                                 onClick={() => navigate('/product/add')}
                             >
                                 Add Product
@@ -162,7 +164,7 @@ const DashboardPage = () => {
                                         {activeTab === 'Material' ? (
                                             <Material material={item} onEdit={() => navigate(`/material/edit/${item._id}`)} />
                                         ) : (
-                                            <div className="p-4 bg-white shadow-md rounded-md">{item.name}</div>
+                                            <Product product={item} onEdit={() => navigate(`/product/edit/${item._id}`)} />
                                         )}
                                     </li>
                                 ))}
@@ -171,7 +173,6 @@ const DashboardPage = () => {
                             <p className="text-gray-600">No {activeTab.toLowerCase()}s available.</p>
                         )}
                     </div>
-
                 </div>
             </div>
         </Layout>
