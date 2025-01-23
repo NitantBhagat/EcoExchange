@@ -2,14 +2,15 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../state/AuthContext';
 import Layout from '../components/Layout';
 import Material from '../components/Material';
+import Product from '../components/Product'; // Assume you have a Product component
 import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('Material');
-    const [items, setItems] = useState([]); // To store the list of materials or products
-    const navigate = useNavigate(); // For navigation
+    const [items, setItems] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -129,7 +130,7 @@ const DashboardPage = () => {
                         </button>
                     </div>
 
-                    {/* Add Material Button */}
+                    {/* Add Item Button */}
                     {activeTab === 'Material' && (
                         <div className="mb-4">
                             <button
@@ -140,19 +141,28 @@ const DashboardPage = () => {
                             </button>
                         </div>
                     )}
+                    {activeTab === 'Product' && (
+                        <div className="mb-4">
+                            <button
+                                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                                onClick={() => navigate('/product/add')}
+                            >
+                                Add Product
+                            </button>
+                        </div>
+                    )}
 
                     {/* List of Items */}
-                    <div className="bg-gray-50 p-4 rounded-lg shadow-md max-w-md">
+                    <div className="bg-gray-50 p-4 rounded-lg shadow-md max-w-md h-[500px] overflow-y-auto">
                         <h4 className="text-lg font-bold mb-4">{activeTab}s</h4>
                         {items.length > 0 ? (
                             <ul className="space-y-4">
                                 {items.map((item) => (
                                     <li key={item._id} className="text-left">
                                         {activeTab === 'Material' ? (
-                                            <Material material={item || { name: 'Unknown', description: 'No description available', category: 'Unknown', location: 'Unknown', quantity: 0, unit: 'N/A', imageUrl: 'https://via.placeholder.com/150' }}
-                                            onEdit={() => navigate(`/material/edit/${item._id}`)} />
+                                            <Material material={item} onEdit={() => navigate(`/material/edit/${item._id}`)} />
                                         ) : (
-                                            <div className="p-4 bg-white shadow-md rounded-md">{item.name || 'Unknown'}</div>
+                                            <div className="p-4 bg-white shadow-md rounded-md">{item.name}</div>
                                         )}
                                     </li>
                                 ))}
@@ -161,6 +171,7 @@ const DashboardPage = () => {
                             <p className="text-gray-600">No {activeTab.toLowerCase()}s available.</p>
                         )}
                     </div>
+
                 </div>
             </div>
         </Layout>

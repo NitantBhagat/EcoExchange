@@ -11,6 +11,7 @@ const MaterialSchema = new mongoose.Schema({
         type: String,
         default: 'https://img.freepik.com/premium-photo/material-word-wooden-block-flat-lay-view-blue-background_446269-288.jpg',
     },
+    isAvailable: { type: Boolean, default: true }, // New field to track availability
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

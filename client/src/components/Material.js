@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Material = ({ material, onEdit }) => {
+const Material = ({ material, onEdit, onRequestMaterial }) => {
     const {
         name = 'Unknown Material',
         category = 'Uncategorized',
@@ -9,8 +9,12 @@ const Material = ({ material, onEdit }) => {
         location = 'Unknown Location',
         description = 'No description available.',
         imageUrl = 'https://via.placeholder.com/150',
-        userId  = { name: 'Unknown', email: 'Unknown' },
+        userId,
+        isAvailable = true,
     } = material;
+
+    const postedByName = userId?.name || 'Unknown';
+    const postedByEmail = userId?.email || 'Unknown';
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
@@ -33,14 +37,26 @@ const Material = ({ material, onEdit }) => {
                 <strong>Description:</strong> {description}
             </p>
             <p className="text-gray-700 mb-4">
-                <strong>Posted By:</strong> {userId.name} 
+                <strong>Posted By:</strong> {postedByName} 
             </p>
-            <button
-                className={`bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700`}
-                onClick={onEdit || (() => alert('Request Material functionality not implemented yet.'))}
-            >
-                {onEdit ? 'Edit Material' : 'Request Material'}
-            </button>
+            <p className={`text-sm font-bold ${isAvailable ? 'text-green-600' : 'text-red-600'} mb-4`}>
+                {isAvailable ? 'Available' : 'Not Available'}
+            </p>
+            {onEdit ? (
+                <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    onClick={onEdit}
+                >
+                    Edit Material
+                </button>
+            ) : onRequestMaterial ? (
+                <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    onClick={onRequestMaterial}
+                >
+                    Request Material
+                </button>
+            ) : null}
         </div>
     );
 };
